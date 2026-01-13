@@ -1,21 +1,24 @@
 #include "absract.h"
-#include <vector>
-#include <exception>
+
 class FileHandle{
 	public:
 		FileHandle();
-		FileHandle(int ac, char **av);
+		FileHandle( int, char ** );
+		FileHandle( const FileHandle & );
 		~FileHandle();
-
+		FileHandle &operator=( const FileHandle & );
 		void readIn();
+		void readFile( char * );
 
 		class InvalidCreation : public std::exception
 		{
 			public: 
 				virtual const char *what() const throw();
 		};
+
+		std::vector<std::string>getVec() const;
+		int getType() const;
 	private:
-		int		ac;
-		int		fd;
+		int entryType;
 		std::vector<std::string> fullFile;
 };
