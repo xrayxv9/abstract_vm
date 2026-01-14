@@ -5,6 +5,14 @@
 #include <iostream>
 #include <vector>
 #include <exception>
+#include <fstream>
+#include <iostream>
+#include <cstdlib>
+#include <map>
+#include <algorithm>
+#include <cstddef>
+#include <ostream>
+#include <string>
 
 // ENUM
 typedef enum {
