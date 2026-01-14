@@ -1,3 +1,5 @@
+#pragma once
+
 #include "absract.h"
 #include <cstddef>
 #include <map>
@@ -28,6 +30,8 @@ class Parsing
 		int handleSecondHalf( std::string &, int, t_command *);
 		size_t findSplit( std::string &, size_t & );
 		size_t findSplitValue( std::string & );
+
+		int checkNumber( std::string &, t_command *, int );
 
 		std::vector<t_command> commands;
 		std::vector<std::string> file;

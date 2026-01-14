@@ -1,5 +1,6 @@
 #include "Parsing.hpp"
 #include <absract.h>
+#include <cctype>
 #include <cstdlib>
 #include <string>
 
@@ -42,9 +43,8 @@ void Parsing::initMatch()
 		this->matchCommand.insert({str[i], i});
 
 	std::string  val[] = {"int8", "int16", "int32", "float", "double"};
-	for (int i = 0; i <= DOUBLE; i++)
+	for (int i = 0; i <= Double; i++)
 		this->matchValue.insert({val[i], i});
-
 }
 
 void Parsing::parseFile()
@@ -83,6 +83,40 @@ void Parsing::parseFile()
 		std::cout << "error: " << errors[i] << std::endl;
 	}
 }
+
+int Parsing::checkNumber( std::string &str, t_command *cmd, int l )
+{
+	size_t i = 0;
+	bool point = false;
+	int err = 0;
+	size_t start = str.find_first_not_of(" \t");
+	size_t ending = str.find_last_not_of(" \t");
+
+	str = str.substr(start, ending - start + 1);
+	std::cout << "tiens: "<< str << std::endl;
+	while (str[i])
+	{
+		if (!std::isdigit(str[i]) && (str[i] != '.' && !point))
+		{
+			err = 1;
+			break ;
+		}
+		else if (str[i] == '.')
+			point = true;
+		i++;
+	}
+	if (err)
+	{
+		this->error = true;
+		std::cout << "str[i]: " << str[i] << std::endl;
+		std::string error = "Invalid format at line: " + std::to_string(l + 1) + ".";
+		this->errors.insert(this->errors.end(), error);
+		return 1;
+	}
+	cmd->value = str;
+	return 0;
+}
+
 
 std::string Parsing::handleComments( std::string &str )
 {
@@ -153,9 +187,19 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 {
 	bool err = false;
 	
+	if (str.empty())
+	{
+		this->error = true;
+		std::string error = "No Value after " + cmd->cmd_written + " at line: " + std::to_string(l + 1) + ".";
+		this->errors.insert(this->errors.end(), error);
+		cmd->command = null;
+		cmd->cmd_written = "";
+		return 1;
+	}
+	std::cout << "str" << str << "." << std::endl;
 	size_t openParent = str.find("(");
 	size_t closeParent = str.find(")");
-	if (openParent == str.length())
+	if (openParent == std::string::npos)
 	{
 		this->error = true;
 		err = true;
@@ -174,6 +218,7 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 
 	size_t whitespace = this->findSplitValue(str);
 	std::string number = str.substr(openParent + 1, closeParent - openParent - 1);
+	std::cout << "number: " << number << std::endl;
 	std::string val = str.substr(whitespace, openParent - whitespace);
 	std::map<std::string, int>::iterator it = this->matchValue.find(val);
 	if (it == this->matchValue.end())
@@ -190,11 +235,11 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 		std::string error = "Invalid Value: " + str + "at line: " + std::to_string(l);
 		this->errors.insert(this->errors.end(), error);
 	}
+	err += this->checkNumber(number, cmd, l);
 	if (err)
 		return 1;
 	cmd->io_written = it->first;
 	cmd->io = it->second;
-	cmd->value = atoll(number.c_str());
 	return 0;
 }
 
@@ -206,7 +251,7 @@ void Parsing::parseLine( int l )
 	std::string second_half;
 	int lineError = 0;
 
-	cmd.value = 0;
+	cmd.value = "";
 	std::string line = handleComments(this->file[l]);
 	if (line == "")
 		return ;
