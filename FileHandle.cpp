@@ -77,7 +77,7 @@ void FileHandle::readFile(char *fileName)
 	while (run)
 	{
 		std::getline(file, line);
-		if (line.find("exit") != std::string::npos)
+		if (line.empty() || line.find("exit") != std::string::npos)
 			run = 0;
 		this->fullFile.insert(this->fullFile.end(), line);
 	}
