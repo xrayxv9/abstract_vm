@@ -1,7 +1,7 @@
 NAME = avm
 
 CC = c++
-FLAGS = -Wall -Werror -Wextra -std=c++98
+FLAGS = -Wall -Werror -Wextra -std=c++98 -g
 
 GREEN = \033[32m
 RED = \033[31m
