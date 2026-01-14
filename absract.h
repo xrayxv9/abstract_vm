@@ -26,21 +26,21 @@ typedef enum {
 	_div,
 	mod,
 	print,
-	_exit
+	_exit,
 } e_commands;
 
 typedef enum {
-	INT8 = 0,
-	INT16,
-	INT32,
-	FLOAT,
-	DOUBLE,
-	null
-} e_IO;
+	Int8 = 0,
+	Int16,
+	Int32,
+	Float,
+	Double,
+} eOperandType;
 
 // DEFINE
 #define STDIN 1
 #define FILE_OUT 2
+#define null 10000
 
 // STRUCT
 typedef struct {
@@ -48,5 +48,5 @@ typedef struct {
 	std::string cmd_written;
 	int io; 
 	std::string io_written;
-	int value;
+	std::string value;
 } t_command;
