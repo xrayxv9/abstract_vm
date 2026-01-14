@@ -2,6 +2,8 @@
 #include "FileHandle.hpp"
 #include "Parsing.hpp"
 
+//TODO give each errors numbers so that they will be able to throw;
+
 int main(int ac, char **av)
 {
 	FileHandle *file = new FileHandle(ac, av);
