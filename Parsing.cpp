@@ -1,5 +1,7 @@
 #include "Parsing.hpp"
 #include <absract.h>
+#include <algorithm>
+#include <ostream>
 #include <string>
 
 Parsing::Parsing(){
@@ -42,7 +44,7 @@ void Parsing::initMatch()
 
 	std::string  val[] = {"int8", "int16", "int32", "float", "double"};
 	for (int i = 0; i <= DOUBLE; i++)
-		this->matchValue.insert({str[i], i});
+		this->matchValue.insert({val[i], i});
 
 }
 
@@ -60,7 +62,7 @@ void Parsing::parseFile()
 
 	for (int i = 0; i < commands.size() ;i++)
 	{
-		std::cout << "command: " << commands[i].command << " value : " << std::endl;
+		std::cout << "command: " << commands[i].command << " written : " << commands[i].cmd_written << " value : " << commands[i].io << " written : " << commands[i].io_written << std::endl;
 	}
 	for (int i = 0; i < errors.size() ;i++)
 	{
@@ -72,6 +74,7 @@ void Parsing::parseFile()
 // The values do not work too, I have a lot of errors, and I have to check for the value INSIDE the parentheses
 void Parsing::parseLine( int line )
 {
+	bool lineError = false;
 	t_command cmd;
 	std::string first_half;
 	std::string second_half;
@@ -79,24 +82,28 @@ void Parsing::parseLine( int line )
 	first_half = this->file[line].substr(0, this->file[line].find(" "));
 	second_half = this->file[line].substr(this->file[line].find(" ") + 1, this->file[line].length());
 
-	std::cout << "first half : " << first_half << std::endl;
-	std::cout << "second half : " << second_half << std::endl;
 	std::map<std::string, int>::iterator it = this->matchCommand.find(first_half);
 	if (it == this->matchCommand.end())
 	{
+		lineError = true;
 		this->error = true;
 		std::string error = "Unknown command: " + first_half + " at line: " + std::to_string(line + 1) + ".";
 		this->errors.insert(this->errors.end(), error);
 	}
 	else
+	{
+		cmd.cmd_written = it->first;
 		cmd.command = it->second;
+	}
 	cmd.io = null;
 	if (cmd.command == push || cmd.command == assert)
 	{
 		bool err = false;
-		it = this->matchValue.find(second_half);
+		std::string val = second_half.substr(0, second_half.find("("));
+		it = this->matchValue.find(val);
 		if (it == this->matchValue.end())
 		{
+			lineError = true;
 			this->error = true;
 			err = true;
 			std::string error = "Unknown Value: " + second_half + " at line: " + std::to_string(line + 1) + ".";
@@ -104,14 +111,17 @@ void Parsing::parseLine( int line )
 		}
 		if (second_half.find(")") + 1 == std::string::npos)
 		{
+			lineError = true;
 			err = true;
 			error = true;
 			std::string error = "Invalid Value: " + second_half + "at line: " + std::to_string(line);
 			this->errors.insert(this->errors.end(), error);
 		}
 		if (err)
-			return ;	
+			return ;
+		cmd.io_written = it->first;
 		cmd.io = it->second;
 	}
-	this->commands.insert(this->commands.end(), cmd);
+	if (!lineError)
+		this->commands.insert(this->commands.end(), cmd);
 }

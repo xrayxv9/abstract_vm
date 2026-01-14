@@ -37,5 +37,8 @@ typedef enum {
 // STRUCT
 typedef struct {
 	int command;
+	std::string cmd_written;
 	int io; 
+	std::string io_written;
+	int value;
 } t_command;
