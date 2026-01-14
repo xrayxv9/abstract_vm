@@ -1,7 +1,6 @@
 #include "Parsing.hpp"
 #include <absract.h>
-#include <algorithm>
-#include <ostream>
+#include <cstdlib>
 #include <string>
 
 Parsing::Parsing(){
@@ -50,6 +49,7 @@ void Parsing::initMatch()
 
 void Parsing::parseFile()
 {
+	bool exitFound = false;
 	if (this->inputType == null)
 		throw InvalidInput();
 	this->initMatch();
@@ -59,10 +59,24 @@ void Parsing::parseFile()
 	{
 		this->parseLine(i);
 	}
+	for (std::vector<t_command>::iterator it = this->commands.begin(); it != this->commands.end(); it++)
+	{
+		if (it->command == _exit)
+		{
+			exitFound = true;
+			break ;
+		}
+	}
 
+	if (!exitFound)
+	{
+		this->error = true;
+		std::string error = "No exit point found.";
+		this->errors.insert(this->errors.end(), error);
+	}
 	for (int i = 0; i < commands.size() ;i++)
 	{
-		std::cout << "command: " << commands[i].command << " written : " << commands[i].cmd_written << " value : " << commands[i].io << " written : " << commands[i].io_written << std::endl;
+		std::cout << "command: " << commands[i].command << " written : " << commands[i].cmd_written << " value : " << commands[i].io << " written : " << commands[i].io_written << " number : " << commands[i].value << std::endl;
 	}
 	for (int i = 0; i < errors.size() ;i++)
 	{
@@ -70,58 +84,146 @@ void Parsing::parseFile()
 	}
 }
 
-// TODO I have to handle the comments, (could be anywhere and could male a command invalid)
-// The values do not work too, I have a lot of errors, and I have to check for the value INSIDE the parentheses
-void Parsing::parseLine( int line )
+std::string Parsing::handleComments( std::string &str )
 {
-	bool lineError = false;
-	t_command cmd;
-	std::string first_half;
-	std::string second_half;
+	if (str.find(";;") != std::string::npos)
+		return "";
+	size_t len = str.find(";");
+	if (len != std::string::npos)
+	{
+		std::string line = str.substr(0, len);
+		return line;
+	}
+	return str;
+}
 
-	first_half = this->file[line].substr(0, this->file[line].find(" "));
-	second_half = this->file[line].substr(this->file[line].find(" ") + 1, this->file[line].length());
+size_t	Parsing::findSplit( std::string &str, size_t &begin )
+{
+	size_t len = 0;
+	bool c = false;
+	while (str[len])
+	{
+		if (c && (str[len] == ' ' || str[len] == '\t'))
+			break ;
+		if (str[len] > ' ' && str[len] < '~')
+		{
+			if (!c)
+				begin = len;
+			c = true;
+		}
+		len++;
+	}
+	return len;
+}
 
-	std::map<std::string, int>::iterator it = this->matchCommand.find(first_half);
+size_t	Parsing::findSplitValue( std::string &str )
+{
+	size_t len = 0;
+	while (str[len])
+	{
+		if (!(str[len] == ' ' || str[len] == '\t'))
+			break ;
+		len++;
+	}
+	std::cout << "len : " << len << std::endl;
+	return len;
+}
+
+int Parsing::handleFirstHalf( std::string &str, int l, t_command *cmd)
+{
+	std::map<std::string, int>::iterator it = this->matchCommand.find(str);
 	if (it == this->matchCommand.end())
 	{
-		lineError = true;
 		this->error = true;
-		std::string error = "Unknown command: " + first_half + " at line: " + std::to_string(line + 1) + ".";
+		std::string error = "Unknown command: " + str + " at line: " + std::to_string(l + 1) + ".";
 		this->errors.insert(this->errors.end(), error);
+		cmd->command = null;
+		cmd->cmd_written = "";
+		return 1;
 	}
 	else
 	{
-		cmd.cmd_written = it->first;
-		cmd.command = it->second;
+		cmd->cmd_written = it->first;
+		cmd->command = it->second;
 	}
-	cmd.io = null;
-	if (cmd.command == push || cmd.command == assert)
+	return 0;
+}
+
+int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
+{
+	bool err = false;
+	
+	size_t openParent = str.find("(");
+	size_t closeParent = str.find(")");
+	if (openParent == str.length())
 	{
-		bool err = false;
-		std::string val = second_half.substr(0, second_half.find("("));
-		it = this->matchValue.find(val);
-		if (it == this->matchValue.end())
-		{
-			lineError = true;
-			this->error = true;
-			err = true;
-			std::string error = "Unknown Value: " + second_half + " at line: " + std::to_string(line + 1) + ".";
-			this->errors.insert(this->errors.end(), error);
-		}
-		if (second_half.find(")") + 1 == std::string::npos)
-		{
-			lineError = true;
-			err = true;
-			error = true;
-			std::string error = "Invalid Value: " + second_half + "at line: " + std::to_string(line);
-			this->errors.insert(this->errors.end(), error);
-		}
-		if (err)
-			return ;
-		cmd.io_written = it->first;
-		cmd.io = it->second;
+		this->error = true;
+		err = true;
+		std::string error = "No open Parenthesis at line: " + std::to_string(l + 1) + ".";
+		this->errors.insert(this->errors.end(), error);
+		return 1;
 	}
+	if (closeParent == str.length())
+	{
+		this->error = true;
+		err = true;
+		std::string error = "No closing Parenthesis at line: " + std::to_string(l + 1) + ".";
+		this->errors.insert(this->errors.end(), error);
+		return 1;
+	}
+
+	size_t whitespace = this->findSplitValue(str);
+	std::string number = str.substr(openParent + 1, closeParent - openParent - 1);
+	std::string val = str.substr(whitespace, openParent - whitespace);
+	std::map<std::string, int>::iterator it = this->matchValue.find(val);
+	if (it == this->matchValue.end())
+	{
+		this->error = true;
+		err = true;
+		std::string error = "Unknown Value: " + str + " at line: " + std::to_string(l + 1) + ".";
+		this->errors.insert(this->errors.end(), error);
+	}
+	if (str.find(")") + 1 == std::string::npos)
+	{
+		err = true;
+		error = true;
+		std::string error = "Invalid Value: " + str + "at line: " + std::to_string(l);
+		this->errors.insert(this->errors.end(), error);
+	}
+	if (err)
+		return 1;
+	cmd->io_written = it->first;
+	cmd->io = it->second;
+	cmd->value = atoll(number.c_str());
+	return 0;
+}
+
+// TODO  check this : (23 3      2)
+void Parsing::parseLine( int l )
+{
+	t_command cmd;
+	std::string first_half;
+	std::string second_half;
+	int lineError = 0;
+
+	cmd.value = 0;
+	std::string line = handleComments(this->file[l]);
+	if (line == "")
+		return ;
+
+	size_t begin = 0;
+	size_t splitPos = this->findSplit(line, begin);
+	first_half = line.substr(begin, splitPos - begin);
+	if (splitPos == line.length())
+		second_half = "";
+	else
+		second_half = line.substr(splitPos + 1, line.length());
+	
+	lineError += this->handleFirstHalf(first_half, l, &cmd);
+	cmd.io = null;
+	
+	if ((cmd.command == push || cmd.command == assert) && !lineError)
+		lineError += this->handleSecondHalf(second_half, l, &cmd);
 	if (!lineError)
 		this->commands.insert(this->commands.end(), cmd);
 }

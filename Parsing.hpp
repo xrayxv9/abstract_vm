@@ -1,4 +1,5 @@
 #include "absract.h"
+#include <cstddef>
 #include <map>
 #include <string>
 
@@ -22,6 +23,11 @@ class Parsing
 
 		void parseLine( int );
 		void initMatch();
+		std::string handleComments( std::string & );
+		int	handleFirstHalf( std::string &, int, t_command * );
+		int handleSecondHalf( std::string &, int, t_command *);
+		size_t findSplit( std::string &, size_t & );
+		size_t findSplitValue( std::string & );
 
 		std::vector<t_command> commands;
 		std::vector<std::string> file;
