@@ -37,6 +37,16 @@ typedef enum {
 	Double,
 } eOperandType;
 
+typedef enum {
+	plus = 0,
+	minus,
+	divide,
+	modulus,
+	mult,
+} calculChar;
+
+
+
 // DEFINE
 #define STDIN 1
 #define FILE_OUT 2
