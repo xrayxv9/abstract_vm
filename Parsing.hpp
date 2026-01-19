@@ -15,7 +15,8 @@ class Parsing
 		~Parsing();
 
 		void parseFile();
-
+		std::vector<t_command> getCommand() const;
+		std::vector<std::string> getError() const;
 	private:
 		class InvalidInput: public std::exception
 		{

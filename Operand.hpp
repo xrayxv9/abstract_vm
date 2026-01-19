@@ -2,13 +2,37 @@
 #include "IOperand.hpp"
 #include <absract.h>
 #include <cmath>
+#include <cstdint>
 #include <string>
 
 template <typename T>
 class Operand: public IOperand
 {
 	public:
-		Operand(eOperandType type, std::string str) : type(type), value(str), number(std::stod(str)){}
+		Operand( eOperandType type, std::string str ) : type(type), value(str), number(std::stod(str))
+		{
+			switch (typeid(T))
+				case int8_t:
+					this->type = Int8;
+		}
+		Operand() {/*throw*/};
+		Operand &operator=( const Operand<eOperandType> &src )
+		{
+				
+			if (this != &src)
+			{
+				this->value = getValue();
+				this->number = getNumber();
+				this->type = getType();
+			}
+			return *this;
+		}
+		
+		Operand( const Operand<eOperandType> &src )
+		{
+			*this = src;
+		}
+		~Operand() {}
 
 		int getPrecision( void ) const
 		{
@@ -23,15 +47,38 @@ class Operand: public IOperand
 		{
 			return (this->calcul(plus, rhs));
 		}
-		IOperand const * operator-( IOperand const & rhs ) const; // Difference
-		IOperand const * operator*( IOperand const & rhs ) const; // Product
-		IOperand const * operator/( IOperand const & rhs ) const; // Quotient
-		IOperand const * operator%( IOperand const & rhs ) const; // Modulo
-		std::string const & toString( void ) const; // String representation of the instance
-		~Operand( void ) {}
+		IOperand const * operator-( IOperand const & rhs ) const
+		{
+			return (this->calcul(minus, rhs));
+		}
+		IOperand const * operator*( IOperand const & rhs ) const
+		{
+			return (this->calcul(mul, rhs));
+		}
+		IOperand const * operator/( IOperand const & rhs ) const
+		{
+			return (this->calcul(divide, rhs));
+		}
+		IOperand const * operator%( IOperand const & rhs ) const
+		{
+			return (this->calcul(modulus, rhs));
+		}
+		std::string const & toString( void ) const
+		{
+			return value;
+		}
 
+		std::string getValue() const
+		{
+			return this->value;
+		}
+
+		long double getNumber() const
+		{
+			return this->number;
+		}
 	private:
-		IOperand const  calcul(char c, IOperand const & rhs) const
+		IOperand const  *calcul(char c, IOperand const & rhs) const
 		{
 			eOperandType type = this->type > rhs.getType()? this->type : rhs.getType();
 			long double overflow = std::pow(2, sizeof(type) - 1) - 1;
@@ -39,18 +86,31 @@ class Operand: public IOperand
 			long double res;
 
 			switch (c) {
-				plus:
+				case plus:
 					res = static_cast<long double>(this->number) + std::stod(rhs.toString());
 					break ;
-				minus:
-					
-			
+				case minus:
+					res = static_cast<long double>(this->number) - std::stod(rhs.toString());
+					break; 
+				case mul:
+					res = static_cast<long double>(this->number) * std::stod(rhs.toString());
+					break ;
+				case modulus:
+					res = std::fmod(static_cast<long double>(this->number), std::stod(rhs.toString()));
+					break ;
+				case divide:
+					if (std::stod(rhs.toString()) != 0)
+						res = static_cast<long double>(this->number) / std::stod(rhs.toString());
+					else
+						;
+					// TODO put an error
+					break ;
 			}
+			// std::numeric_limits<type>.max
 			if (res >= overflow)
 				;
 			return new Operand(type, std::to_string(res));
 		}
-
 		eOperandType type;
 		std::string value;
 		long double number;

@@ -76,7 +76,7 @@ void Parsing::parseFile()
 	}
 	for (int i = 0; i < commands.size() ;i++)
 	{
-		std::cout << "command: " << commands[i].command << " written : " << commands[i].cmd_written << " value : " << commands[i].io << " written : " << commands[i].io_written << " number : " << commands[i].value << std::endl;
+		std::cout << "command enum: " << commands[i].command << " command: " << commands[i].cmd_written << " value enum: " << commands[i].io << " value written : " << commands[i].io_written << " number : " << commands[i].value << std::endl;
 	}
 	for (int i = 0; i < errors.size() ;i++)
 	{
@@ -93,10 +93,9 @@ int Parsing::checkNumber( std::string &str, t_command *cmd, int l )
 	size_t ending = str.find_last_not_of(" \t");
 
 	str = str.substr(start, ending - start + 1);
-	std::cout << "tiens: "<< str << std::endl;
 	while (str[i])
 	{
-		if (!std::isdigit(str[i]) && (str[i] != '.' && !point))
+		if (!std::isdigit(str[i]) && (str[i] != '.' || (str[i] == '.' && point)))
 		{
 			err = 1;
 			break ;
@@ -227,6 +226,7 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 		err = true;
 		std::string error = "Unknown Value: " + str + " at line: " + std::to_string(l + 1) + ".";
 		this->errors.insert(this->errors.end(), error);
+		return 1;
 	}
 	if (str.find(")") + 1 == std::string::npos)
 	{
@@ -234,6 +234,7 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 		error = true;
 		std::string error = "Invalid Value: " + str + "at line: " + std::to_string(l);
 		this->errors.insert(this->errors.end(), error);
+		return 1;
 	}
 	err += this->checkNumber(number, cmd, l);
 	if (err)

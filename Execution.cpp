@@ -1,5 +1,7 @@
 #include "Execution.hpp"
+#include <Operand.hpp>
 #include <absract.h>
+#include <cstdint>
 #include <stack>
 
 Execution::Execution()
@@ -7,7 +9,7 @@ Execution::Execution()
 	return ;
 }
 
-Execution::Execution( std::vector<t_command> &cmds )
+Execution::Execution( const std::vector<t_command> &cmds )
 {
 	this->commands = cmds;
 }
@@ -27,7 +29,7 @@ Execution &Execution::operator=( const Execution &src )
 	return *this;
 }
 
-std::stack<long long int> Execution::getStack() const
+std::stack<Operand<eOperandType>*> Execution::getStack() const
 {
 	return this->s;
 }
@@ -35,4 +37,17 @@ std::stack<long long int> Execution::getStack() const
 std::vector<t_command> Execution::getCommands() const
 {
 	return this->commands;
+}
+
+void Execution::fatalError()
+{
+	Operand<int8_t> *op = new Operand<int8_t>(Int8, "coucou");
+	s.push(op);
+	for (Operand<eOperandType> *op = this->s.top(); !this->s.empty(); op = this->s.top())
+	{
+		delete op;
+
+
+		this->s.pop();
+	}
 }

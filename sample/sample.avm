@@ -1,10 +1,10 @@
 ; -------------
 ; sample.avm -
 ; -------------
-push								 
-			push			                int32(                                       33			)
+push (1 2)
+			push			                int32(			33	   )
 add
-push float(44.55)
+push float(44.........55)            
 mul
 push double(42.42)
 push int32(42)

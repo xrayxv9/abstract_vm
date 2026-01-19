@@ -11,6 +11,7 @@ RESET = \033[0m
 
 SRC = FileHandle.cpp \
 	  Parsing.cpp \
+	  Execution.cpp \
 	  main.cpp
 
 OBJS_SRC = $(SRC:.cpp=.o)
