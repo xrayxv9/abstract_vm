@@ -27,6 +27,7 @@ typedef enum {
 	mod,
 	print,
 	_exit,
+	nullCommand,
 } e_commands;
 
 typedef enum {
@@ -35,6 +36,7 @@ typedef enum {
 	Int32,
 	Float,
 	Double,
+	nullOperand
 } eOperandType;
 
 typedef enum {
@@ -50,13 +52,13 @@ typedef enum {
 // DEFINE
 #define STDIN 1
 #define FILE_OUT 2
-#define null 10000
+#define ERROR_IN 3
 
 // STRUCT
 typedef struct {
-	int command;
+	e_commands command;
 	std::string cmd_written;
-	int io; 
+	eOperandType io; 
 	std::string io_written;
 	std::string value;
 } t_command;
