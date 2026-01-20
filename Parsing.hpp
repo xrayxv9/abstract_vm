@@ -36,8 +36,8 @@ class Parsing
 
 		std::vector<t_command> commands;
 		std::vector<std::string> file;
-		std::map<std::string, int> matchCommand;
-		std::map<std::string, int> matchValue;
+		std::map<std::string, e_commands> matchCommand;
+		std::map<std::string, eOperandType> matchValue;
 		std::vector<std::string> errors;
 		int inputType;
 		bool error;

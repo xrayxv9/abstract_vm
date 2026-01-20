@@ -5,7 +5,7 @@
 #include <string>
 
 Parsing::Parsing(){
-	this->inputType = null;
+	this->inputType = ERROR_IN;
 }
 
 Parsing::Parsing( std::vector<std::string>commands, int inputType ){
@@ -39,18 +39,30 @@ const char *Parsing::InvalidInput::what() const throw()
 void Parsing::initMatch()
 {
 	std::string str[] = {"push", "pop", "dump", "assert", "add", "sub", "mul", "div", "mod", "print", "exit"};
-	for (int i = 0; i <= _exit; i++)
-		this->matchCommand.insert({str[i], i});
+	this->matchCommand.insert({str[0], push});
+	this->matchCommand.insert({str[1], pop});
+	this->matchCommand.insert({str[2], dump});
+	this->matchCommand.insert({str[3], assert});
+	this->matchCommand.insert({str[4], add});
+	this->matchCommand.insert({str[5], sub});
+	this->matchCommand.insert({str[6], mul});
+	this->matchCommand.insert({str[7], _div});
+	this->matchCommand.insert({str[8], mod});
+	this->matchCommand.insert({str[9], print});
+	this->matchCommand.insert({str[10], _exit});
 
 	std::string  val[] = {"int8", "int16", "int32", "float", "double"};
-	for (int i = 0; i <= Double; i++)
-		this->matchValue.insert({val[i], i});
+	this->matchValue.insert({val[0], Int8});
+	this->matchValue.insert({val[1], Int16});
+	this->matchValue.insert({val[2], Int32});
+	this->matchValue.insert({val[3], Float});
+	this->matchValue.insert({val[4], Double});
 }
 
 void Parsing::parseFile()
 {
 	bool exitFound = false;
-	if (this->inputType == null)
+	if (this->inputType == ERROR_IN)
 		throw InvalidInput();
 	this->initMatch();
 
@@ -74,10 +86,10 @@ void Parsing::parseFile()
 		std::string error = "No exit point found.";
 		this->errors.insert(this->errors.end(), error);
 	}
-	for (int i = 0; i < commands.size() ;i++)
-	{
-		std::cout << "command enum: " << commands[i].command << " command: " << commands[i].cmd_written << " value enum: " << commands[i].io << " value written : " << commands[i].io_written << " number : " << commands[i].value << std::endl;
-	}
+	// for (int i = 0; i < commands.size() ;i++)
+	// {
+	// 	std::cout << "command enum: " << commands[i].command << " command: " << commands[i].cmd_written << " value enum: " << commands[i].io << " value written : " << commands[i].io_written << " number : " << commands[i].value << std::endl;
+	// }
 	for (int i = 0; i < errors.size() ;i++)
 	{
 		std::cout << "error: " << errors[i] << std::endl;
@@ -158,19 +170,18 @@ size_t	Parsing::findSplitValue( std::string &str )
 			break ;
 		len++;
 	}
-	std::cout << "len : " << len << std::endl;
 	return len;
 }
 
 int Parsing::handleFirstHalf( std::string &str, int l, t_command *cmd)
 {
-	std::map<std::string, int>::iterator it = this->matchCommand.find(str);
+	std::map<std::string, e_commands>::iterator it = this->matchCommand.find(str);
 	if (it == this->matchCommand.end())
 	{
 		this->error = true;
 		std::string error = "Unknown command: " + str + " at line: " + std::to_string(l + 1) + ".";
 		this->errors.insert(this->errors.end(), error);
-		cmd->command = null;
+		cmd->command = nullCommand;
 		cmd->cmd_written = "";
 		return 1;
 	}
@@ -191,11 +202,10 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 		this->error = true;
 		std::string error = "No Value after " + cmd->cmd_written + " at line: " + std::to_string(l + 1) + ".";
 		this->errors.insert(this->errors.end(), error);
-		cmd->command = null;
+		cmd->command = nullCommand;
 		cmd->cmd_written = "";
 		return 1;
 	}
-	std::cout << "str" << str << "." << std::endl;
 	size_t openParent = str.find("(");
 	size_t closeParent = str.find(")");
 	if (openParent == std::string::npos)
@@ -217,9 +227,8 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 
 	size_t whitespace = this->findSplitValue(str);
 	std::string number = str.substr(openParent + 1, closeParent - openParent - 1);
-	std::cout << "number: " << number << std::endl;
 	std::string val = str.substr(whitespace, openParent - whitespace);
-	std::map<std::string, int>::iterator it = this->matchValue.find(val);
+	std::map<std::string, eOperandType>::iterator it = this->matchValue.find(val);
 	if (it == this->matchValue.end())
 	{
 		this->error = true;
@@ -266,10 +275,15 @@ void Parsing::parseLine( int l )
 		second_half = line.substr(splitPos + 1, line.length());
 	
 	lineError += this->handleFirstHalf(first_half, l, &cmd);
-	cmd.io = null;
+	cmd.io = nullOperand;
 	
 	if ((cmd.command == push || cmd.command == assert) && !lineError)
 		lineError += this->handleSecondHalf(second_half, l, &cmd);
 	if (!lineError)
 		this->commands.insert(this->commands.end(), cmd);
+}
+
+std::vector<t_command> Parsing::getCommand() const
+{
+	return this->commands;
 }
