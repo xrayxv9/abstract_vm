@@ -9,11 +9,17 @@ template <typename T>
 class Operand: public IOperand
 {
 	public:
-		Operand( eOperandType type, std::string str ) : type(type), value(str), number(std::stod(str))
+		Operand( eOperandType type, std::string str )
 		{
-			switch (typeid(T))
-				case int8_t:
-					this->type = Int8;
+			this->type = type;
+			this->value = str;
+			if (this->type != Int8 || this->type != Int16 || this->type != Int32)
+				this->number = static_cast<T>(std::stoi(this->value));
+			else if (this->type == Double)
+				this->number = static_cast<T>(std::stod(this->value));
+			else
+				this->number = static_cast<T>(std::stof(this->value));
+				
 		}
 		Operand() {/*throw*/};
 		Operand &operator=( const Operand<eOperandType> &src )

@@ -11,7 +11,9 @@ int main(int ac, char **av)
 	Parsing *parser = new Parsing(file->getVec(), file->getType());
 	parser->parseFile();
 	Execution *exec = new Execution( parser->getCommand() );
+	exec->fullExec();
 
 	delete parser;
 	delete file;
+	delete exec;
 }
