@@ -1,7 +1,7 @@
 NAME = avm
 
 CC = c++
-FLAGS = -Wall -Werror -Wextra -std=c++98 -g
+FLAGS = -Wall -Werror -Wextra -std=c++20 -g
 
 GREEN = \033[32m
 RED = \033[31m
@@ -12,6 +12,7 @@ RESET = \033[0m
 SRC = FileHandle.cpp \
 	  Parsing.cpp \
 	  Execution.cpp \
+	  Factory.cpp \
 	  main.cpp
 
 OBJS_SRC = $(SRC:.cpp=.o)
