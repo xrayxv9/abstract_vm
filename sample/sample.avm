@@ -1,10 +1,9 @@
 ; -------------
 ; sample.avm -
 ; -------------
-push int8(12)
-push int32(33)
-assert int8(32)
-push float(44.55)            
-push int8(1)
+push int8(-127)
+push int8(1)            
+dump
+sub
 dump
 exit
