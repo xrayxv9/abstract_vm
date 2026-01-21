@@ -1,4 +1,5 @@
 #include "Execution.hpp"
+#include <Factory.hpp>
 #include <IOperand.hpp>
 #include <Operand.hpp>
 #include <absract.h>
@@ -59,6 +60,11 @@ void Execution::fatalError()
 	}
 }
 
+void Execution::pushValue( const IOperand *op )
+{
+	this->s.push_front(op);
+}
+
 void Execution::_push()
 {
 	this->s.push_front(fact.createOperand(this->commands[this->i].io, this->commands[this->i].value));
@@ -79,8 +85,8 @@ void Execution::_dump()
 {
 	IOperand *tmp;
 
-	for (auto it = s.rbegin(); it != s.rend(); ++it)
-		std::cout << *it << " " <<  (*it)->toString() << std::endl;
+	for (auto it : s)
+		std::cout << it << " " <<  it->toString() << std::endl;
 }
 
 void Execution::_assert()
@@ -88,10 +94,38 @@ void Execution::_assert()
 	if (this->rax != nullptr)
 		delete this->rax;
 	this->_pop();
-	if (this->rax->toString() == this->commands[i].cmd_written)
+	if (this->rax->getType() == this->commands[i].io && this->rax->toString() == this->commands[i].value)
 		this->_push();
 	else
 		std::cerr << "error" << std::endl;
+}
+
+void Execution::_add()
+{
+	if (s.size() < 2)
+		std::cerr << "Error: Not enough numbers in your stack" << std::endl;
+	_pop();
+	const IOperand *tmp = this->rax;
+	_pop();
+	const IOperand *op = *tmp + *this->rax;
+	this->pushValue(op);
+	delete tmp;
+	delete this->rax;
+	this->rax = nullptr;
+}
+
+void Execution::_sub()
+{
+	if (s.size() < 2)
+		std::cerr << "Error: Not enough numbers in your stack" << std::endl;
+	_pop();
+	const IOperand *tmp = this->rax;
+	_pop();
+	const IOperand *op = *tmp - *this->rax;
+	this->pushValue(op);
+	delete tmp;
+	delete this->rax;
+	this->rax = nullptr;
 }
 
 void Execution::mapInit()
@@ -100,8 +134,8 @@ void Execution::mapInit()
 	this->mapedCommands[pop] = &Execution::_pop;
 	this->mapedCommands[dump] = &Execution::_dump;
 	this->mapedCommands[assert] = &Execution::_assert;
-	// this->mapedCommands[add] = &Execution::_add;
-	// this->mapedCommands[sub] = &Execution::_sub;
+	this->mapedCommands[add] = &Execution::_add;
+	this->mapedCommands[sub] = &Execution::_sub;
 	// this->mapedCommands[mul] = &Execution::_mul;
 	// this->mapedCommands[_div] = &Execution::__div;
 	// this->mapedCommands[mod] = &Execution::_mod;

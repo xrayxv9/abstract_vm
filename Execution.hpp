@@ -25,12 +25,14 @@ class Execution
 	private:
 		void fatalError();
 
+		void pushValue( const IOperand *op );
+
 		void _push();
 		void _pop();
 		void _dump();
 		void _assert();
-		// void _add();
-		// void _sub();
+		void _add();
+		void _sub();
 		// void _mul();
 		// void __div();
 		// void _mod();
