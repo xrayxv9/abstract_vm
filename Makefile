@@ -13,6 +13,7 @@ SRC = FileHandle.cpp \
 	  Parsing.cpp \
 	  Execution.cpp \
 	  Factory.cpp \
+	  Exception.cpp \
 	  main.cpp
 
 OBJS_SRC = $(SRC:.cpp=.o)
