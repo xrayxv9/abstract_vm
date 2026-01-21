@@ -1,6 +1,7 @@
 #pragma once
 
 #include "absract.h"
+#include <Exception.hpp>
 #include <cstddef>
 #include <map>
 #include <string>
@@ -18,12 +19,6 @@ class Parsing
 		std::vector<t_command> getCommand() const;
 		std::vector<std::string> getError() const;
 	private:
-		class InvalidInput: public std::exception
-		{
-			public: 
-				virtual const char *what() const throw();
-		};
-
 		void parseLine( int );
 		void initMatch();
 		std::string handleComments( std::string & );
@@ -41,4 +36,5 @@ class Parsing
 		std::vector<std::string> errors;
 		int inputType;
 		bool error;
+		int toThrow;
 };

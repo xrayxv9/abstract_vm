@@ -1,16 +1,19 @@
+#include "absract.h"
 #include "Parsing.hpp"
-#include <absract.h>
 #include <cctype>
 #include <cstdlib>
 #include <string>
+#include "Exception.hpp"
 
 Parsing::Parsing(){
-	this->inputType = ERROR_IN;
+	this->inputType = 0;
+	this->toThrow = 0;
 }
 
 Parsing::Parsing( std::vector<std::string>commands, int inputType ){
 	this->inputType = inputType;
 	this->file = commands;
+	this->toThrow = 0;
 }
 
 Parsing::Parsing( const Parsing &cpy )
@@ -30,11 +33,6 @@ Parsing &Parsing::operator=( const Parsing &src )
 }
 
 Parsing::~Parsing() {}
-
-const char *Parsing::InvalidInput::what() const throw()
-{
-	return "The input given is invalid";
-}
 
 void Parsing::initMatch()
 {
@@ -62,10 +60,10 @@ void Parsing::initMatch()
 void Parsing::parseFile()
 {
 	bool exitFound = false;
-	if (this->inputType == ERROR_IN)
-		throw InvalidInput();
-	this->initMatch();
+	if (!this->inputType)
+		return ;
 
+	this->initMatch();
 	this->error = false;
 	for (int i = 0; i < this->file.size(); i++)
 	{
@@ -82,17 +80,17 @@ void Parsing::parseFile()
 
 	if (!exitFound)
 	{
-		this->error = true;
-		std::string error = "No exit point found.";
-		this->errors.insert(this->errors.end(), error);
+		if (this->toThrow == 0)
+			this->toThrow = PARSING_ERROR;
 	}
-	// for (int i = 0; i < commands.size() ;i++)
-	// {
-	// 	std::cout << "command enum: " << commands[i].command << " command: " << commands[i].cmd_written << " value enum: " << commands[i].io << " value written : " << commands[i].io_written << " number : " << commands[i].value << std::endl;
-	// }
 	for (int i = 0; i < errors.size() ;i++)
-	{
 		std::cout << "error: " << errors[i] << std::endl;
+	switch (this->toThrow) {
+		case PARSING_ERROR:
+			throw (ParsingError(""));
+		case LEXER_ERROR:
+			throw (LexerError(""));
+	
 	}
 }
 
@@ -121,6 +119,8 @@ int Parsing::checkNumber( std::string &str, t_command *cmd, int l )
 	}
 	if (err)
 	{
+		if (!this->toThrow)
+			this->toThrow = PARSING_ERROR;
 		this->error = true;
 		std::cout << "str[i]: " << str[i] << std::endl;
 		std::string error = "Invalid format at line: " + std::to_string(l + 1) + ".";
@@ -181,6 +181,8 @@ int Parsing::handleFirstHalf( std::string &str, int l, t_command *cmd)
 	std::map<std::string, e_commands>::iterator it = this->matchCommand.find(str);
 	if (it == this->matchCommand.end())
 	{
+		if (!this->toThrow)
+			this->toThrow = LEXER_ERROR;
 		this->error = true;
 		std::string error = "Unknown command: " + str + " at line: " + std::to_string(l + 1) + ".";
 		this->errors.insert(this->errors.end(), error);
@@ -202,6 +204,8 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 	
 	if (str.empty())
 	{
+		if (!this->toThrow)
+			this->toThrow = PARSING_ERROR;
 		this->error = true;
 		std::string error = "No Value after " + cmd->cmd_written + " at line: " + std::to_string(l + 1) + ".";
 		this->errors.insert(this->errors.end(), error);
@@ -213,6 +217,8 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 	size_t closeParent = str.find(")");
 	if (openParent == std::string::npos)
 	{
+		if (!this->toThrow)
+			this->toThrow = PARSING_ERROR;
 		this->error = true;
 		err = true;
 		std::string error = "No open Parenthesis at line: " + std::to_string(l + 1) + ".";
@@ -221,6 +227,8 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 	}
 	if (closeParent == str.length())
 	{
+		if (!this->toThrow)
+			this->toThrow = PARSING_ERROR;
 		this->error = true;
 		err = true;
 		std::string error = "No closing Parenthesis at line: " + std::to_string(l + 1) + ".";
@@ -234,6 +242,8 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 	std::map<std::string, eOperandType>::iterator it = this->matchValue.find(val);
 	if (it == this->matchValue.end())
 	{
+		if (!this->toThrow)
+			this->toThrow = LEXER_ERROR;
 		this->error = true;
 		err = true;
 		std::string error = "Unknown Value: " + str + " at line: " + std::to_string(l + 1) + ".";
@@ -242,6 +252,8 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 	}
 	if (str.find(")") + 1 == std::string::npos)
 	{
+		if (!this->toThrow)
+			this->toThrow = PARSING_ERROR;
 		err = true;
 		error = true;
 		std::string error = "Invalid Value: " + str + "at line: " + std::to_string(l);
