@@ -13,6 +13,7 @@
 #include <cstddef>
 #include <ostream>
 #include <string>
+#include "Exception.hpp"
 
 // ENUM
 typedef enum {
@@ -52,7 +53,8 @@ typedef enum {
 // DEFINE
 #define STDIN 1
 #define FILE_OUT 2
-#define ERROR_IN 3
+#define LEXER_ERROR 3
+#define PARSING_ERROR 4
 
 // STRUCT
 typedef struct {
