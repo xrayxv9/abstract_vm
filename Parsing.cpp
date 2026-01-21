@@ -122,7 +122,6 @@ int Parsing::checkNumber( std::string &str, t_command *cmd, int l )
 		if (!this->toThrow)
 			this->toThrow = PARSING_ERROR;
 		this->error = true;
-		std::cout << "str[i]: " << str[i] << std::endl;
 		std::string error = "Invalid format at line: " + std::to_string(l + 1) + ".";
 		this->errors.insert(this->errors.end(), error);
 		return 1;
