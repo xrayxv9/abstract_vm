@@ -100,6 +100,7 @@ int Parsing::checkNumber( std::string &str, t_command *cmd, int l )
 {
 	size_t i = 0;
 	bool point = false;
+	bool minus = false;
 	int err = 0;
 	size_t start = str.find_first_not_of(" \t");
 	size_t ending = str.find_last_not_of(" \t");
@@ -107,13 +108,15 @@ int Parsing::checkNumber( std::string &str, t_command *cmd, int l )
 	str = str.substr(start, ending - start + 1);
 	while (str[i])
 	{
-		if (!std::isdigit(str[i]) && (str[i] != '.' || (str[i] == '.' && point)))
+		if (!std::isdigit(str[i]) && (str[i] != '.' || (str[i] == '.' && point)) && (str[i] != '-' || (str[i] == '-' && minus)))
 		{
 			err = 1;
 			break ;
 		}
 		else if (str[i] == '.')
 			point = true;
+		else if (str[i] == '-')
+			minus = true;
 		i++;
 	}
 	if (err)
