@@ -25,7 +25,14 @@ const char *RuntimeError::what() const noexcept
 	return (msg.c_str());
 }
 
-SegFault::SegFault( const std::string &msg ): RuntimeError(msg) {}
 ParsingError::ParsingError( const std::string &msg ): RuntimeError("Parsing Error" + msg) {}
+
 LexerError::LexerError( const std::string &msg ): RuntimeError("Lexer Error" + msg) {}
-// InvalidInput::InvalidInput( const std::string &msg ): RuntimeError(msg) {}
+
+NotEnoughPushedValues::NotEnoughPushedValues( const std::string &msg ): RuntimeError("Not enough values in the stack to do this opperation") {}
+
+ExitTooSoon::ExitTooSoon( const std::string &msg ): RuntimeError("Exit Found before the end of every instructions") {}
+
+WrongType::WrongType( const std::string &msg ): RuntimeError("Wrong type put as input") {}
+
+PopOnEmptyStack::PopOnEmptyStack( const std::string &msg ): RuntimeError("You tried to pop on an empty stack") {}

@@ -18,12 +18,6 @@ class RuntimeError : public std::exception
 		std::string msg;
 };
 
-class SegFault : public RuntimeError
-{
-	public:
-		SegFault( const std::string & );
-};
-
 class ParsingError: public RuntimeError
 {
 	public:
@@ -36,8 +30,26 @@ class LexerError: public RuntimeError
 		LexerError( const std::string & );
 };
 
-// class segFault : public RuntimeError
-// {
-// 	public:
-// 		segFault( const std::string & );
-// };
+class NotEnoughPushedValues : public RuntimeError
+{
+	public:
+		NotEnoughPushedValues( const std::string & );
+};
+
+class ExitTooSoon : public RuntimeError
+{
+	public:
+		ExitTooSoon( const std::string & );
+};
+
+class WrongType : public RuntimeError
+{
+	public:
+		WrongType( const std::string & );
+};
+
+class PopOnEmptyStack : public RuntimeError
+{
+	public:
+		PopOnEmptyStack( const std::string & );
+};
