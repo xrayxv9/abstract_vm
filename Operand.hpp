@@ -3,6 +3,7 @@
 #include <absract.h>
 #include <cmath>
 #include <cstdint>
+#include <limits>
 #include <string>
 
 template <typename T>
@@ -93,29 +94,49 @@ class Operand: public IOperand
 
 			switch (c) {
 				case plus:
-					res = static_cast<long double>(this->number) + std::stod(rhs.toString());
+					res = std::stod(this->value) + std::stod(rhs.toString());
 					break ;
 				case minus:
-					res = static_cast<long double>(this->number) - std::stod(rhs.toString());
+					res = std::stod(this->value) - std::stod(rhs.toString());
 					break; 
 				case mul:
-					res = static_cast<long double>(this->number) * std::stod(rhs.toString());
+					res = std::stod(this->value) * std::stod(rhs.toString());
 					break ;
 				case modulus:
-					res = std::fmod(static_cast<long double>(this->number), std::stod(rhs.toString()));
+					res = std::fmod(std::stod(this->value), std::stod(rhs.toString()));
 					break ;
 				case divide:
 					if (std::stod(rhs.toString()) != 0)
-						res = static_cast<long double>(this->number) / std::stod(rhs.toString());
+						res = std::stod(this->value) / std::stod(rhs.toString());
 					else
 						;
 					// TODO put an error
 					break ;
 			}
-			// std::numeric_limits<type>.max
-			if (res >= overflow)
-				;
-			return new Operand(type, std::to_string(res));
+			switch (type) {
+				case Int8:
+					if (std::numeric_limits<int8_t>::min() > res || std::numeric_limits<int8_t>::max() < res)
+						std::cerr << "overflow or underflow" << std::endl;
+					return new Operand(type, std::to_string(static_cast<int8_t>(res)));
+				case Int16:
+					if (std::numeric_limits<int16_t>::min() > res || std::numeric_limits<int16_t>::max() < res)
+						std::cerr << "overflow or underflow" << std::endl;
+					return new Operand(type, std::to_string(static_cast<int16_t>(res)));
+				case Int32:
+					if (std::numeric_limits<int32_t>::min() > res || std::numeric_limits<int32_t>::max() < res)
+						std::cerr << "overflow or underflow" << std::endl;
+					return new Operand(type, std::to_string(static_cast<int32_t>(res)));
+				case Float:
+					if (std::numeric_limits<float>::min() > res || std::numeric_limits<float>::max() < res)
+						std::cerr << "overflow or underflow" << std::endl;
+					return new Operand(type, std::to_string(static_cast<float>(res)));
+				case Double:
+					if (std::numeric_limits<double>::min() > res || std::numeric_limits<double>::max() < res)
+						std::cerr << "overflow or underflow" << std::endl;
+					return new Operand(type, std::to_string(static_cast<double>(res)));
+				default:
+					return nullptr;
+			}
 		}
 		eOperandType type;
 		std::string value;
