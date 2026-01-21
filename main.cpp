@@ -9,11 +9,18 @@ int main(int ac, char **av)
 {
 	FileHandle *file = new FileHandle(ac, av);
 	Parsing *parser = new Parsing(file->getVec(), file->getType());
-	parser->parseFile();
-	Execution *exec = new Execution( parser->getCommand() );
-	exec->fullExec();
+	try
+	{
+		parser->parseFile();
+		Execution *exec = new Execution( parser->getCommand() );
+		exec->fullExec();
 
+		delete exec;
+	}
+	catch (std::exception &err)
+	{
+		std::cerr << err.what() << std::endl;
+	}
 	delete parser;
 	delete file;
-	delete exec;
 }
