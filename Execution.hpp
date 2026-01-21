@@ -33,11 +33,10 @@ class Execution
 		void _assert();
 		void _add();
 		void _sub();
-		// void _mul();
-		// void __div();
-		// void _mod();
-		// void _print();
-		// void __exit();
+		void _mul();
+		void __div();
+		void _mod();
+		void _print();
 
 		Factory fact;
 		std::vector<t_command> commands;

@@ -3,9 +3,8 @@
 #include <IOperand.hpp>
 #include <Operand.hpp>
 #include <absract.h>
-#include <cstdint>
 #include <list>
-#include <stack>
+#include <string>
 
 Execution::Execution()
 {
@@ -128,6 +127,65 @@ void Execution::_sub()
 	this->rax = nullptr;
 }
 
+void Execution::_mul()
+{
+	if (s.size() < 2)
+		std::cerr << "Error: Not enough numbers in your stack" << std::endl;
+	_pop();
+	const IOperand *tmp = this->rax;
+	_pop();
+	const IOperand *op = *tmp * *this->rax;
+	this->pushValue(op);
+	delete tmp;
+	delete this->rax;
+	this->rax = nullptr;
+}
+
+void Execution::__div()
+{
+	if (s.size() < 2)
+		std::cerr << "Error: Not enough numbers in your stack" << std::endl;
+	_pop();
+	const IOperand *tmp = this->rax;
+	_pop();
+	const IOperand *op = *tmp / *this->rax;
+	this->pushValue(op);
+	delete tmp;
+	delete this->rax;
+	this->rax = nullptr;
+}
+
+void Execution::_mod()
+{
+	if (s.size() < 2)
+		std::cerr << "Error: Not enough numbers in your stack" << std::endl;
+	_pop();
+	const IOperand *tmp = this->rax;
+	_pop();
+	const IOperand *op = *tmp % *this->rax;
+	this->pushValue(op);
+	delete tmp;
+	delete this->rax;
+	this->rax = nullptr;
+}
+
+void Execution::_print()
+{
+	this->_pop();
+	
+	if (this->rax->getType() == Int8)
+	{
+		std::cout << static_cast<char>(std::stoi(this->rax->toString())) << std::endl;
+	}
+	else
+	{
+		std::cerr << "bah non c'est pas ce qu'il faut" << std::endl;
+	}
+	pushValue(this->rax);
+	this->rax = nullptr;
+}
+
+
 void Execution::mapInit()
 {
 	this->mapedCommands[push] = &Execution::_push;
@@ -136,11 +194,10 @@ void Execution::mapInit()
 	this->mapedCommands[assert] = &Execution::_assert;
 	this->mapedCommands[add] = &Execution::_add;
 	this->mapedCommands[sub] = &Execution::_sub;
-	// this->mapedCommands[mul] = &Execution::_mul;
-	// this->mapedCommands[_div] = &Execution::__div;
-	// this->mapedCommands[mod] = &Execution::_mod;
-	// this->mapedCommands[print] = &Execution::_print;
-	// this->mapedCommands[_exit] = &Execution::__exit;
+	this->mapedCommands[mul] = &Execution::_mul;
+	this->mapedCommands[_div] = &Execution::__div;
+	this->mapedCommands[mod] = &Execution::_mod;
+	this->mapedCommands[print] = &Execution::_print;
 }
 
 void Execution::fullExec()
@@ -152,8 +209,12 @@ void Execution::fullExec()
 	for (i = 0; i < len; i++)
 	{
 		e_commands cmd = this->commands[i].command;
+		if (cmd == _exit)
+			break ;
 		auto it = this->mapedCommands.find(cmd);
 		if (it != this->mapedCommands.end())
 			(this->*(it->second))();
 	}
+	if (this->i != commands.size())
+		std::cerr << "You did not finish all the instruction, exit too soon" << std::endl;
 }
