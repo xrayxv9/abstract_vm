@@ -1,9 +1,9 @@
 ; -------------
 ; sample.avm -
 ; -------------
-push int8(-127)
-push int8(1)            
-dump
-sub
-dump
+push int8(1)
+push int8(41)
+add
+print
+pop
 exit
