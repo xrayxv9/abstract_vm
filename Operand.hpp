@@ -103,15 +103,20 @@ class Operand: public IOperand
 					res = std::stod(this->value) * std::stod(rhs.toString());
 					break ;
 				case modulus:
+					if (rhs.toString() == "0")
+					{
+						std::cerr << "Division by 0" << std::endl;
+						return nullptr;	
+					}
 					res = std::fmod(std::stod(this->value), std::stod(rhs.toString()));
 					break ;
 				case divide:
-					if (std::stod(rhs.toString()) != 0)
-						res = std::stod(this->value) / std::stod(rhs.toString());
-					else
-						;
-					// TODO put an error
-					break ;
+					if (rhs.toString() == "0")
+					{
+						std::cerr << "Division by 0" << std::endl;
+						return nullptr;	
+					}
+					res = std::stod(this->value) / std::stod(rhs.toString());
 			}
 			switch (type) {
 				case Int8:
