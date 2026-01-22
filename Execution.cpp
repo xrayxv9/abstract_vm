@@ -80,6 +80,8 @@ void Execution::_pop()
 {
 	if (this->s.empty())
 		throw PopOnEmptyStack("");
+	if (this->rax != nullptr)
+		delete this->rax;
 	rax = this->s.front();
 	this->s.pop_front();
 }
