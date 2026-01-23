@@ -1,5 +1,6 @@
 #pragma once
 #include "IOperand.hpp"
+#include <Exception.hpp>
 #include <absract.h>
 #include <cmath>
 #include <cstdint>
@@ -104,40 +105,36 @@ class Operand: public IOperand
 					break ;
 				case modulus:
 					if (rhs.toString() == "0")
-					{
-						std::cerr << "Division by 0" << std::endl;
-						return nullptr;	
-					}
+						throw DivisionByZero("");
+					if (rhs.getType() == Float || rhs.getType() == Double)
+						throw DivisionByNonInteger("");
 					res = std::fmod(std::stod(this->value), std::stod(rhs.toString()));
 					break ;
 				case divide:
 					if (rhs.toString() == "0")
-					{
-						std::cerr << "Division by 0" << std::endl;
-						return nullptr;	
-					}
+						throw DivisionByZero("");
 					res = std::stod(this->value) / std::stod(rhs.toString());
 			}
 			switch (type) {
 				case Int8:
 					if (std::numeric_limits<int8_t>::min() > res || std::numeric_limits<int8_t>::max() < res)
-						std::cerr << "overflow or underflow" << std::endl;
+						throw OverflowUnderflow("");
 					return new Operand(type, std::to_string(static_cast<int8_t>(res)));
 				case Int16:
 					if (std::numeric_limits<int16_t>::min() > res || std::numeric_limits<int16_t>::max() < res)
-						std::cerr << "overflow or underflow" << std::endl;
+						throw OverflowUnderflow("");
 					return new Operand(type, std::to_string(static_cast<int16_t>(res)));
 				case Int32:
 					if (std::numeric_limits<int32_t>::min() > res || std::numeric_limits<int32_t>::max() < res)
-						std::cerr << "overflow or underflow" << std::endl;
+						throw OverflowUnderflow("");
 					return new Operand(type, std::to_string(static_cast<int32_t>(res)));
 				case Float:
 					if (std::numeric_limits<float>::min() > res || std::numeric_limits<float>::max() < res)
-						std::cerr << "overflow or underflow" << std::endl;
+						throw OverflowUnderflow("");
 					return new Operand(type, std::to_string(static_cast<float>(res)));
 				case Double:
 					if (std::numeric_limits<double>::min() > res || std::numeric_limits<double>::max() < res)
-						std::cerr << "overflow or underflow" << std::endl;
+						throw OverflowUnderflow("");
 					return new Operand(type, std::to_string(static_cast<double>(res)));
 				default:
 					return nullptr;
