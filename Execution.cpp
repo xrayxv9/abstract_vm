@@ -102,7 +102,7 @@ void Execution::_assert()
 	if (this->rax->getType() == this->commands[i].io && this->rax->toString() == this->commands[i].value)
 		this->_push();
 	else
-		std::cerr << "error" << std::endl;
+		throw AssertError("");
 }
 
 void Execution::_add()
@@ -111,6 +111,7 @@ void Execution::_add()
 		throw NotEnoughPushedValues("");
 	_pop();
 	const IOperand *tmp = this->rax;
+	this->rax = nullptr;
 	_pop();
 	const IOperand *op = *tmp + *this->rax;
 	this->pushValue(op);
@@ -125,6 +126,7 @@ void Execution::_sub()
 		throw NotEnoughPushedValues("");
 	_pop();
 	const IOperand *tmp = this->rax;
+	this->rax = nullptr;
 	_pop();
 	const IOperand *op = *tmp - *this->rax;
 	this->pushValue(op);
@@ -139,6 +141,7 @@ void Execution::_mul()
 		throw NotEnoughPushedValues("");
 	_pop();
 	const IOperand *tmp = this->rax;
+	this->rax = nullptr;
 	_pop();
 	const IOperand *op = *tmp * *this->rax;
 	this->pushValue(op);
@@ -153,12 +156,19 @@ void Execution::__div()
 		throw NotEnoughPushedValues("");
 	_pop();
 	const IOperand *tmp = this->rax;
-	_pop();
-	const IOperand *op = *tmp / *this->rax;
-	this->pushValue(op);
-	delete tmp;
-	delete this->rax;
 	this->rax = nullptr;
+	_pop();
+	try {
+		const IOperand *op = *tmp / *this->rax;
+		this->pushValue(op);
+		delete tmp;
+		delete this->rax;
+		this->rax = nullptr;
+	}
+	catch( RuntimeError &err ){
+		delete tmp;
+		throw err;
+	}
 }
 
 void Execution::_mod()
@@ -167,12 +177,19 @@ void Execution::_mod()
 		throw NotEnoughPushedValues("");
 	_pop();
 	const IOperand *tmp = this->rax;
-	_pop();
-	const IOperand *op = *tmp % *this->rax;
-	this->pushValue(op);
-	delete tmp;
-	delete this->rax;
 	this->rax = nullptr;
+	_pop();
+	try{
+		const IOperand *op = *tmp % *this->rax;
+		this->pushValue(op);
+		delete tmp;
+		delete this->rax;
+		this->rax = nullptr;
+	}
+	catch ( RuntimeError &err ){
+		delete tmp;
+		throw err;
+	}
 }
 
 void Execution::_print()
