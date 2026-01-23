@@ -53,3 +53,28 @@ class PopOnEmptyStack : public RuntimeError
 	public:
 		PopOnEmptyStack( const std::string & );
 };
+
+
+class DivisionByZero : public RuntimeError
+{
+	public:
+		DivisionByZero( const std::string & );
+};
+
+class DivisionByNonInteger : public RuntimeError
+{
+	public:
+		DivisionByNonInteger( const std::string & );
+};
+
+class OverflowUnderflow : public RuntimeError
+{
+	public:
+		OverflowUnderflow( const std::string & );
+};
+
+class AssertError : public RuntimeError
+{
+	public:
+		AssertError( const std::string & );
+};

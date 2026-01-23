@@ -36,3 +36,11 @@ ExitTooSoon::ExitTooSoon( const std::string &msg ): RuntimeError("Exit Found bef
 WrongType::WrongType( const std::string &msg ): RuntimeError("Wrong type put as input") {}
 
 PopOnEmptyStack::PopOnEmptyStack( const std::string &msg ): RuntimeError("You tried to pop on an empty stack") {}
+
+DivisionByZero::DivisionByZero( const std::string &msg ): RuntimeError("Error, Division by zero") {}
+
+DivisionByNonInteger::DivisionByNonInteger( const std::string &msg ): RuntimeError("Division by non integer value is not possible on modulus") {}
+
+OverflowUnderflow::OverflowUnderflow( const std::string &msg ): RuntimeError("Overflow or underflow detected") {}
+
+AssertError::AssertError( const std::string &msg ): RuntimeError("Assertion Error") {}
