@@ -111,8 +111,14 @@ int Parsing::checkNumber( std::string &str, t_command *cmd, int l )
 			err = 1;
 			break ;
 		}
-		else if (str[i] == '.')
+		else if (str[i] == '.' && cmd->io != Int8 && cmd->io != Int16 && cmd->io != Int32)
 			point = true;
+		else if (str[i] == '.' && cmd->io != Double && cmd->io != Float)
+		{
+			if (this->toThrow)
+				this->toThrow = PARSING_ERROR;
+			err = true;
+		}
 		else if (str[i] == '-')
 			minus = true;
 		i++;
@@ -224,7 +230,7 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 		this->errors.insert(this->errors.end(), error);
 		return 1;
 	}
-	if (closeParent == str.length())
+	if (closeParent == std::string::npos)
 	{
 		if (!this->toThrow)
 			this->toThrow = PARSING_ERROR;
@@ -259,11 +265,11 @@ int Parsing::handleSecondHalf( std::string &str, int l, t_command *cmd)
 		this->errors.insert(this->errors.end(), error);
 		return 1;
 	}
+	cmd->io = it->second;
+	cmd->io_written = it->first;
 	err += this->checkNumber(number, cmd, l);
 	if (err)
 		return 1;
-	cmd->io_written = it->first;
-	cmd->io = it->second;
 	return 0;
 }
 
