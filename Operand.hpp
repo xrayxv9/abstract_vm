@@ -1,6 +1,7 @@
 #pragma once
 #include "IOperand.hpp"
 #include <Exception.hpp>
+#include "Factory.hpp"
 #include <absract.h>
 #include <cmath>
 #include <cstdint>
@@ -123,47 +124,48 @@ class Operand: public IOperand
 
 			switch (c) {
 				case plus:
-					res = std::stod(this->value) + std::stod(rhs.toString());
+					res = std::stod(rhs.toString()) + std::stod(this->value);
 					break ;
 				case minus:
-					res = std::stod(this->value) - std::stod(rhs.toString());
+					res =  std::stod(rhs.toString()) - std::stod(this->value);
 					break; 
 				case mul:
-					res = std::stod(this->value) * std::stod(rhs.toString());
+					res = std::stod(rhs.toString()) * std::stod(this->value);
 					break ;
 				case modulus:
-					if (rhs.toString() == "0")
+					if (this->value == "0")
 						throw DivisionByZero("");
-					if (rhs.getType() == Float || rhs.getType() == Double)
+					if (this->getType() == Float || this->getType() == Double)
 						throw DivisionByNonInteger("");
-					res = std::fmod(std::stod(this->value), std::stod(rhs.toString()));
+					res = std::fmod(std::stod(rhs.toString()), std::stod(this->value));
 					break ;
 				case divide:
-					if (rhs.toString() == "0")
+					if (this->value == "0")
 						throw DivisionByZero("");
-					res = std::stod(this->value) / std::stod(rhs.toString());
+					res = std::stod(rhs.toString()) / std::stod(this->value) ;
 			}
+			Factory fact;
 			switch (type) {
 				case Int8:
 					if (std::numeric_limits<int8_t>::min() > res || std::numeric_limits<int8_t>::max() < res)
 						throw OverflowUnderflow("");
-					return new Operand(type, std::to_string(static_cast<int8_t>(res)));
+					return fact.createOperand(type, std::to_string(static_cast<int8_t>(res)));
 				case Int16:
 					if (std::numeric_limits<int16_t>::min() > res || std::numeric_limits<int16_t>::max() < res)
 						throw OverflowUnderflow("");
-					return new Operand(type, std::to_string(static_cast<int16_t>(res)));
+					return fact.createOperand(type, std::to_string(static_cast<int16_t>(res)));
 				case Int32:
 					if (std::numeric_limits<int32_t>::min() > res || std::numeric_limits<int32_t>::max() < res)
 						throw OverflowUnderflow("");
-					return new Operand(type, std::to_string(static_cast<int32_t>(res)));
+					return fact.createOperand(type, std::to_string(static_cast<int32_t>(res)));
 				case Float:
 					if (-std::numeric_limits<float>::max() > res || std::numeric_limits<float>::max() < res)
 						throw OverflowUnderflow("");
-					return new Operand(type, std::to_string(static_cast<float>(res)));
+					return fact.createOperand(type, std::to_string(static_cast<float>(res)));
 				case Double:
 					if (-std::numeric_limits<double>::max() > res || std::numeric_limits<double>::max() < res)
 						throw OverflowUnderflow("");
-					return new Operand(type, std::to_string(static_cast<double>(res)));
+					return fact.createOperand(type, std::to_string(static_cast<double>(res)));
 				default:
 					return nullptr;
 			}
