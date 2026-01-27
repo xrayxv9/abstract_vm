@@ -1,8 +1,9 @@
 #include "Exception.hpp"
+#include <stdexcept>
 
-RuntimeError::RuntimeError(): msg("") {}
-RuntimeError::RuntimeError( const std::string &msg ): msg(msg) {}
-RuntimeError::RuntimeError( const RuntimeError &src )
+RuntimeError::RuntimeError(): std::runtime_error("") {}
+RuntimeError::RuntimeError( const std::string &msg ): std::runtime_error(""), msg(msg){}
+RuntimeError::RuntimeError( const RuntimeError &src ): std::runtime_error(src.msg), msg(src.msg)
 {
 	*this = src;
 }

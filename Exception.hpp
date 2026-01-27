@@ -1,9 +1,8 @@
 #pragma once
 
-#include <exception>
-#include <iostream>
+#include <stdexcept>
 
-class RuntimeError : public std::exception
+class RuntimeError : public std::runtime_error
 {
 	public:
 		RuntimeError();
