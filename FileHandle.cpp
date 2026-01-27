@@ -46,6 +46,17 @@ FileHandle::FileHandle(int ac, char **av)
 	}
 }
 
+bool FileHandle::checkEmpty( std::string &line )
+{
+	int i = 0;
+	for (char c = line[i]; c != '\0'; i++, c = line[i])
+	{
+		if (c != '\t' && c != ' ' && c != '\n')
+			return false;
+	}
+	return true;
+}
+
 void FileHandle::readIn()
 {
 	std::string line;
@@ -58,7 +69,8 @@ void FileHandle::readIn()
 			return ;
 		if (line.find(";;") != std::string::npos)
 			run = 0;
-		this->fullFile.insert(this->fullFile.end(), line);
+		if (!line.empty() && !checkEmpty(line))
+			this->fullFile.insert(this->fullFile.end(), line);
 	}
 }
 
@@ -76,10 +88,12 @@ void FileHandle::readFile(char *fileName)
 	}
 	while (run)
 	{
-		std::getline(file, line);
-		if (line.empty() || line.find("exit") != std::string::npos)
+		if (!std::getline(file, line))
+			break ;
+		if (line.find("exit") != std::string::npos)
 			run = 0;
-		this->fullFile.insert(this->fullFile.end(), line);
+		if (!line.empty() && !checkEmpty(line))
+			this->fullFile.insert(this->fullFile.end(), line);
 	}
 	file.close();
 }

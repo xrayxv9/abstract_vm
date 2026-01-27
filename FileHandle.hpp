@@ -21,6 +21,7 @@ class FileHandle{
 		std::vector<std::string>getVec() const;
 		int getType() const;
 	private:
+		bool checkEmpty( std::string & );
 		int entryType;
 		std::vector<std::string> fullFile;
 };
