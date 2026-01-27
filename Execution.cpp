@@ -97,9 +97,12 @@ void Execution::_dump()
 void Execution::_assert()
 {
 	if (this->rax != nullptr)
+	{
 		delete this->rax;
+		this->rax = nullptr;
+	}
 	this->_pop();
-	if (this->rax->getType() == this->commands[i].io && this->rax->toString() == this->commands[i].value)
+	if (this->rax->getType() == this->commands[i].io && std::stod(this->rax->toString()) == stod(this->commands[i].value))
 		this->_push();
 	else
 		throw AssertError("");
