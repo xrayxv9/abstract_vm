@@ -66,9 +66,7 @@ void Parsing::parseFile()
 	this->initMatch();
 	this->error = false;
 	for (int i = 0; i < this->file.size(); i++)
-	{
 		this->parseLine(i);
-	}
 	for (std::vector<t_command>::iterator it = this->commands.begin(); it != this->commands.end(); it++)
 	{
 		if (it->command == _exit)
@@ -84,7 +82,7 @@ void Parsing::parseFile()
 			this->toThrow = PARSING_ERROR;
 	}
 	for (int i = 0; i < errors.size() ;i++)
-		std::cout << "error: " << errors[i] << std::endl;
+		std::cerr << "error: " << errors[i] << std::endl;
 	switch (this->toThrow) {
 		case PARSING_ERROR:
 			throw (ParsingError(""));
