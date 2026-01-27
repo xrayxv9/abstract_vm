@@ -1,4 +1,5 @@
 avm
 *.o
 
+sample/
 compile_commands.json
