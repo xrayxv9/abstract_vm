@@ -15,12 +15,40 @@ class Operand: public IOperand
 		{
 			this->type = type;
 			this->value = str;
-			if (this->type != Int8 || this->type != Int16 || this->type != Int32)
+			if (this->type == Int8 || this->type == Int16 || this->type == Int32)
 				this->number = static_cast<T>(std::stoi(this->value));
 			else if (this->type == Double)
 				this->number = static_cast<T>(std::stod(this->value));
 			else
 				this->number = static_cast<T>(std::stof(this->value));
+
+
+			long double res = std::stod(this->value);
+			switch (type) {
+				case Int8:
+					if (std::numeric_limits<int8_t>::min() > res || std::numeric_limits<int8_t>::max() < res)
+						throw OverflowUnderflow("");
+					break;
+				case Int16:
+					if (std::numeric_limits<int16_t>::min() > res || std::numeric_limits<int16_t>::max() < res)
+						throw OverflowUnderflow("");
+					break ;
+				case Int32:
+					if (std::numeric_limits<int32_t>::min() > res || std::numeric_limits<int32_t>::max() < res)
+						throw OverflowUnderflow("");
+					break ;
+				case Float:
+					if (-std::numeric_limits<float>::max() > res || std::numeric_limits<float>::max() < res)
+						throw OverflowUnderflow("");
+					break ;
+				case Double:
+					if (-std::numeric_limits<double>::max() > res || std::numeric_limits<double>::max() < res)
+						throw OverflowUnderflow("");
+					break;
+				default	:
+					break ;
+			}
+
 				
 		}
 		Operand() {/*throw*/};
@@ -129,11 +157,11 @@ class Operand: public IOperand
 						throw OverflowUnderflow("");
 					return new Operand(type, std::to_string(static_cast<int32_t>(res)));
 				case Float:
-					if (std::numeric_limits<float>::min() > res || std::numeric_limits<float>::max() < res)
+					if (-std::numeric_limits<float>::max() > res || std::numeric_limits<float>::max() < res)
 						throw OverflowUnderflow("");
 					return new Operand(type, std::to_string(static_cast<float>(res)));
 				case Double:
-					if (std::numeric_limits<double>::min() > res || std::numeric_limits<double>::max() < res)
+					if (-std::numeric_limits<double>::max() > res || std::numeric_limits<double>::max() < res)
 						throw OverflowUnderflow("");
 					return new Operand(type, std::to_string(static_cast<double>(res)));
 				default:
