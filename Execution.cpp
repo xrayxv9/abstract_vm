@@ -113,11 +113,18 @@ void Execution::_add()
 	const IOperand *tmp = this->rax;
 	this->rax = nullptr;
 	_pop();
-	const IOperand *op = *tmp + *this->rax;
-	this->pushValue(op);
-	delete tmp;
-	delete this->rax;
-	this->rax = nullptr;
+	try{
+		const IOperand *op = *tmp + *this->rax;
+		this->pushValue(op);
+		delete tmp;
+		delete this->rax;
+		this->rax = nullptr;
+	}
+	catch (RuntimeError &err)
+	{
+		delete tmp;
+		throw err;
+	}
 }
 
 void Execution::_sub()
@@ -128,11 +135,17 @@ void Execution::_sub()
 	const IOperand *tmp = this->rax;
 	this->rax = nullptr;
 	_pop();
-	const IOperand *op = *tmp - *this->rax;
-	this->pushValue(op);
-	delete tmp;
-	delete this->rax;
-	this->rax = nullptr;
+	try{
+		const IOperand *op = *tmp - *this->rax;
+		this->pushValue(op);
+		delete tmp;
+		delete this->rax;
+		this->rax = nullptr;
+	}
+	catch ( RuntimeError &err ){
+		delete tmp;
+		throw err;
+	}
 }
 
 void Execution::_mul()
@@ -143,11 +156,17 @@ void Execution::_mul()
 	const IOperand *tmp = this->rax;
 	this->rax = nullptr;
 	_pop();
-	const IOperand *op = *tmp * *this->rax;
-	this->pushValue(op);
-	delete tmp;
-	delete this->rax;
-	this->rax = nullptr;
+	try{
+		const IOperand *op = *tmp * *this->rax;
+		this->pushValue(op);
+		delete tmp;
+		delete this->rax;
+		this->rax = nullptr;
+	}
+	catch ( RuntimeError &err ){
+		delete tmp;
+		throw err;
+	}
 }
 
 void Execution::__div()
